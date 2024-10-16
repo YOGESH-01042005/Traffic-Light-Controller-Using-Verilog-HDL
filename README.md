@@ -30,59 +30,58 @@ Save and Document Results:
 Capture screenshots of the waveform and save the simulation logs to include in your report.
 
 Verilog Code for Traffic Light Controller
-
-// traffic_light_controller.v
-module traffic_light_controller (
-    input wire clk,
-    input wire reset,
-    output reg [2:0] lights  // 3-bit output: [2]=Red, [1]=Yellow, [0]=Green
-);
-    // Define states
-    typedef enum reg [1:0] {
-        GREEN = 2'b00,
-        YELLOW = 2'b01,
-        RED = 2'b10
-    } state_t;
-
-    state_t current_state, next_state;
-    reg [3:0] counter;  // Timer counter
-
-    // State transition based on counter
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            current_state <= GREEN;
-            counter <= 0;
-        end else begin
-            if (counter == 4'd9) begin
-                current_state <= next_state;
-                counter <= 0;
-            end else begin
-                counter <= counter + 1;
-            end
-        end
-    end
-
-    // Next state logic and output control
-    always @(*) begin
-        case (current_state)
-            GREEN: begin
-                lights = 3'b001;  // Green light on
-                next_state = YELLOW;
-            end
-            YELLOW: begin
-                lights = 3'b010;  // Yellow light on
-                next_state = RED;
-            end
-            RED: begin
-                lights = 3'b100;  // Red light on
-                next_state = GREEN;
-            end
-            default: begin
-                lights = 3'b000;  // All lights off
-                next_state = GREEN;
-            end
-        endcase
-    end
+module moore_1001(input clk,rst,x,
+output reg z);
+parameter [2:0] S0=3'b000,
+S1=3'b001,
+S2=3'b010,
+S3=3'b011,
+S4=3'b100;
+reg [2:0]state;
+always @(posedge clk)
+begin
+if(rst)begin
+state<=S0;
+z<=1'b0;
+end
+else
+begin
+case(state)
+S0:begin
+z<=1'b0;
+if(x==1'b1)
+state<=S1;
+else
+state<=S0;
+end
+S1:begin
+z<=1'b0;
+if(x==1'b1)
+state<=S1;
+else
+state<=S2;
+end
+S2:begin
+z<=1'b0;
+if(x==1'b1)
+state<=S1;
+else
+state<=S3;
+end
+S3:begin
+z<=1'b0;
+if(x==1'b1)
+state<=S1;
+else
+state<=S4;
+end
+S4:begin
+z<=1'b1;
+state<=S0;
+end
+endcase
+end
+end
 endmodule
 
 Testbench for Traffic Light Controller
@@ -128,7 +127,7 @@ module traffic_light_controller_tb;
     end
 
 endmodule
-
+output:![IMG-20241016-WA0036 1](https://github.com/user-attachments/assets/fa6e6960-cd28-459b-9577-a0ae69a24885)
 
 Conclusion
 In this experiment, a traffic light controller was successfully designed and simulated using Verilog HDL. The design controlled the traffic lights to switch between Green, Yellow, and Red in a cyclic manner based on timing intervals. The testbench verified that the traffic lights followed the correct sequence and timing. The simulation results confirm the correct functionality of the traffic light controller, demonstrating the effectiveness of Verilog HDL in designing FSM-based controllers for real-world applications.
